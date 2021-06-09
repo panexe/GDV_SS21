@@ -5,13 +5,53 @@
 #include <opencv2/opencv.hpp>
 
 
+static const std::string PATH_YOSHI = "C:\\Users\\lars\\Documents\\Uni\\SS21\\gdv\\Praktikum3\\yoshi.png";
+static const std::string PATH_MASK = "C:\\Users\\lars\\Documents\\Uni\\SS21\\gdv\\Praktikum3\\mask.png";
+static const std::string PATH_INPUT = "C:\\Users\\lars\\Documents\\Uni\\SS21\\gdv\\Praktikum3\\FigSource.png";
+static const std::string PATH_TARGET = "C:\\Users\\lars\\Documents\\Uni\\SS21\\gdv\\Praktikum3\\FigTarget.png";
+static const std::string SAVE_TO_PATH = "C:\\Users\\lars\\Documents\\Uni\\SS21\\gdv\\Praktikum3\\yoshi_save.png";
+
+void aufgabe1() {
+    // read yoshi 
+    cv::Mat yoshi = cv::imread(PATH_YOSHI);
+
+    // print width, height, and number of channels to the console
+    std::cout << "Breite: " << yoshi.cols << " Hoehe: " << yoshi.rows << " Farbkanaele: " << yoshi.channels() << '\n';
+    
+    // convert to floating point
+    yoshi.convertTo(yoshi, CV_32FC3, 1 / 255.0);
+
+    cv::namedWindow("Aufgabe1", cv::WINDOW_AUTOSIZE); // Create a window
+    cv::imshow("Aufgabe1", yoshi); // Show our image inside it.
+    cv::waitKey(0);
+
+    // specify the rectangle and draw it to the yoshi image
+    cv::Rect r(yoshi.cols / 2, yoshi.rows / 2, 10, 10);
+    cv::rectangle(yoshi, r, cv::Scalar(0, 0, 255), -1); // -1 for filling the rectangle
+
+    // set each 5. row to 0 
+    for (int i = 0; i < yoshi.rows; i++) {
+        if (!(i % 5))
+            yoshi.row(i) *= 0; // easy solution 
+
+            // more explicit solution
+            //yoshi.row(i) = cv::Mat::zeros(cv::Size(yoshi.cols, 1), CV_32FC3);
+    }
+    cv::namedWindow("Aufgabe1", cv::WINDOW_AUTOSIZE); // Create a window
+    cv::imshow("Aufgabe1", yoshi); // Show our image inside it.
+    cv::waitKey(0);
+
+    cv::imwrite(SAVE_TO_PATH, yoshi);
+    
+}
+
 void aufgabe2() {
     // read yoshi and convert to hsv
-    cv::Mat yoshi = cv::imread("C:\\Users\\lars\\Documents\\Uni\\SS21\\gdv\\Praktikum3\\yoshi.png");
+    cv::Mat yoshi = cv::imread(PATH_YOSHI);
     cv::cvtColor(yoshi, yoshi, cv::COLOR_BGR2HSV);
 
     // read mask and convert to grayscale
-    cv::Mat mask = cv::imread("C:\\Users\\lars\\Documents\\Uni\\SS21\\gdv\\Praktikum3\\mask.png");
+    cv::Mat mask = cv::imread(PATH_MASK);
     cv::cvtColor(mask, mask, cv::COLOR_BGR2GRAY);
 
     cv::Mat yoshiEdit; // placeholder for the resulting image
@@ -40,9 +80,6 @@ void aufgabe2() {
     cv::waitKey(0);
 }
 
-void aufgabe2_alt() {
-
-}
 
 enum ColorSpace {
     RGB, 
@@ -52,8 +89,8 @@ enum ColorSpace {
 
 void aufgabe3(ColorSpace cs = ColorSpace::LAB, std::string window_name= "") {
     // read input and target 
-    cv::Mat input = cv::imread("C:\\Users\\lars\\Documents\\Uni\\SS21\\gdv\\Praktikum3\\FigSource.png");
-    cv::Mat target = cv::imread("C:\\Users\\lars\\Documents\\Uni\\SS21\\gdv\\Praktikum3\\FigTarget.png");
+    cv::Mat input = cv::imread(PATH_INPUT);
+    cv::Mat target = cv::imread(PATH_TARGET);
 
     cv::namedWindow("Original"+window_name, cv::WINDOW_AUTOSIZE); // Create a window
     cv::imshow("Original" + window_name, input); // Show our image inside it.
@@ -124,74 +161,10 @@ void aufgabe3(ColorSpace cs = ColorSpace::LAB, std::string window_name= "") {
 
 int main()
 {
-
+    aufgabe1();
+    aufgabe2();
     aufgabe3(ColorSpace::RGB, " RGB");
     aufgabe3(ColorSpace::HSV, " HSV");
     aufgabe3(ColorSpace::LAB, " LAB");
     return 0;
-    aufgabe2();
-
-    
-
-    return 0;
-
-    /*
-    double minVal, maxVal;
-    cv::Point minLoc, maxLoc;
-
-    cv::minMaxLoc(maskCopy, &minVal, &maxVal, &minLoc, &maxLoc);
-    std::cout << "Min Val: " << minVal << " Max Val: " << maxVal << '\n';
-    */
-    
-    
-
-
-    return 0;
-    cv::Mat frame = cv::imread("C:\\Users\\lars\\Documents\\Uni\\SS21\\gdv\\Praktikum3\\yoshi.png"); // Read the file
-    if (frame.empty()) // Check for invalid input
-    {
-        std::cout << "Could not open or find the frame" << std::endl;
-        return -1;
-    }
-    cv::namedWindow("Window", cv::WINDOW_AUTOSIZE); // Create a window
-    cv::imshow("Window", frame); // Show our image inside it.
-    cv::waitKey(0);
-
-    std::cout << "Anzahl Farbkanaele: " << frame.channels() << '\n';
-    std::cout << "Beite: " << frame.cols << " Hoehe: " << frame.rows << '\n';
-    
-    cv::Mat frameFloat;
-    frame.convertTo(frameFloat, CV_32FC3, 1/255.0);
-    std::cout << (frameFloat.type() == CV_32FC3) << '\n';
-
-
-    //cv::Rect r = cv::Rect(frameFloat.cols / 2, frameFloat.rows / 2, 10, 10);
-    //cv::rectangle(frameFloat, r, cv::Scalar(0,0,255), 2, 8, 0);
-
-    for (int i = 0; i < frameFloat.cols; i++) {
-        
-        if (i % 5) {
-            cv::Rect r = cv::Rect(0, i, frameFloat.rows, 1);
-            cv::rectangle(frameFloat, r, cv::Scalar(0, 0, 0), 0, 8, 0);
-        }
-    }
-
-    cv::namedWindow("Window", cv::WINDOW_AUTOSIZE);
-    cv::imshow("Window", frameFloat);
-    cv::waitKey(0); // Wait for a keystroke in the window
-
-    cv::imwrite("C:\\Users\\lars\\Documents\\Uni\\SS21\\gdv\\Praktikum3\\yoshi_write.png",frame);
-
-    return 0;
 }
-
-// Programm ausführen: STRG+F5 oder Menüeintrag "Debuggen" > "Starten ohne Debuggen starten"
-// Programm debuggen: F5 oder "Debuggen" > Menü "Debuggen starten"
-
-// Tipps für den Einstieg: 
-//   1. Verwenden Sie das Projektmappen-Explorer-Fenster zum Hinzufügen/Verwalten von Dateien.
-//   2. Verwenden Sie das Team Explorer-Fenster zum Herstellen einer Verbindung mit der Quellcodeverwaltung.
-//   3. Verwenden Sie das Ausgabefenster, um die Buildausgabe und andere Nachrichten anzuzeigen.
-//   4. Verwenden Sie das Fenster "Fehlerliste", um Fehler anzuzeigen.
-//   5. Wechseln Sie zu "Projekt" > "Neues Element hinzufügen", um neue Codedateien zu erstellen, bzw. zu "Projekt" > "Vorhandenes Element hinzufügen", um dem Projekt vorhandene Codedateien hinzuzufügen.
-//   6. Um dieses Projekt später erneut zu öffnen, wechseln Sie zu "Datei" > "Öffnen" > "Projekt", und wählen Sie die SLN-Datei aus.
